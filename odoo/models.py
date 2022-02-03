@@ -1887,9 +1887,9 @@ class BaseModel(MetaModel('DummyModel', (object,), {'_register': False})):
         if first_a_gby['type'] not in ('date', 'datetime'):
             return data
         interval = first_a_gby['interval']
-        granularity = first_a_gby['granularity']
-        tz = pytz.timezone(self._context['tz']) if first_a_gby["tz_convert"] else False
         groupby_name = groupby[0]
+        granularity = groupby_name.split(':')[-1] if ':' in groupby_name else 'month'
+        tz = pytz.timezone(self._context['tz']) if first_a_gby["tz_convert"] else False
 
         # existing non null datetimes
         existing = [d[groupby_name] for d in data if d[groupby_name]] or [None]
