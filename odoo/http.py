@@ -46,6 +46,7 @@ except ImportError:
 
 import odoo
 from odoo import fields
+from odoo.tools import config
 from .service.server import memory_info
 from .service import security, model as service_model
 from .tools.func import lazy_property
@@ -1431,8 +1432,9 @@ class Root(object):
         #   (the one using the cookie). That is a special feature of the Session Javascript class.
         # - It could allow session fixation attacks.
         if not explicit_session and hasattr(response, 'set_cookie'):
+            max_age = int(config.get('session_max_age', 90))
             response.set_cookie(
-                'session_id', httprequest.session.sid, max_age=90 * 24 * 60 * 60, httponly=True)
+                'session_id', httprequest.session.sid, max_age=max_age * 24 * 60 * 60, httponly=True)
 
         return response
 
@@ -1442,7 +1444,6 @@ class Root(object):
         """
         try:
             httprequest = werkzeug.wrappers.Request(environ)
-            httprequest.app = self
             httprequest.parameter_storage_class = werkzeug.datastructures.ImmutableOrderedMultiDict
             threading.current_thread().url = httprequest.url
             threading.current_thread().query_count = 0
